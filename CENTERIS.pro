@@ -1,5 +1,12 @@
+
 TEMPLATE = subdirs
+CONFIG += ordered
 
 SUBDIRS += \
     Logger \
-    Utils
+    Utils \
+    EventExtractor
+
+Utils.depends = Logger
+EventExtractor.depends = Logger Utils
+
