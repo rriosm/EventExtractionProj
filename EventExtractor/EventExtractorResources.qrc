@@ -1,0 +1,12 @@
+<RCC>
+    <qresource lang="en" prefix="/Resources">
+        <file alias="Result02">Resources/ResultsTests/Result02.txt</file>
+        <file alias="Result01">Resources/ResultsTests/Result01.txt</file>
+        <file alias="Request01">Resources/Requests/Request01.txt</file>
+        <file alias="CurlPost01">Resources/CurlsPost/CurlPost01.txt</file>
+        <file alias="SystemProfile">Resources/Prompts/SystemProfile.txt</file>
+        <file alias="UserPromptTemplate">Resources/Prompts/UserPromptTemplate.txt</file>
+        <file alias="BaselinePrompt">Resources/Prompts/BaselinePrompt.txt</file>
+        <file alias="ExampleOfModelAndManifestConsolidatedFile">Resources/Examples/ExampleOfModelAndManifestConsolidatedFile.txt</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,57 @@
+Apply the attached SYSTEM PROFILE exactly to the following football (soccer) video clip and its associated VTT.
+
+## INPUT
+
+1. **Video clip bounds and mode**
+- clip_video_id: "{{clip_video_id}}"
+- clip_start_video: "{{clip_start_video}}" (HH:MM:SS.zzz in video time)
+- clip_end_video: "{{clip_end_video}}" (HH:MM:SS.zzz in video time)
+- slowdown_factor: {{slowdown_factor}}
+- Assumption: the video is slow‑motion at {{slowdown_factor}} FPS; use this to infer momentum between frames. A slowdown_factor of 1 or 0 (slowdown_factor=1 or slowdown_factor=0) means that the video is not in slow motion.
+
+2. **VTT input (timed text)**
+The VTT start and end timestamps are:
+- vtt_start_time: {{vtt_start_time}} (HH:MM:SS.zzz in VTT time)
+- vtt_end_time: {{vtt_end_time}} (HH:MM:SS.zzz in VTT time)
+
+Paste the VTT‑style events here (or state "VTT is provided as a separate file"):
+
+{{paste_vtt_here}}
+
+3. **Optional visual context (if known)**
+- Camera angle: {{camera_angle}}
+- Visibility / lighting: {{visibility}}
+- Any known ambiguity: {{ambiguities}} (e.g., obscured offside, mixed camera angles)
+
+---
+
+## TASK
+
+Using the **full SYSTEM PROFILE** already provided to you:
+
+1. **Scan the video** within `clip_start_video` / `clip_end_video` using the defined priority‑order 1–16.
+2. **If VTT available, verify every VTT line** against the video (confirmed / rejected), including those that fall outside the clip; mark them as rejected if out‑of‑bounds.
+3. **Detect video‑only priority events** that are not listed in the VTT.
+4. **Map timestamps**:
+- Convert `timestamp_video` to `timestamp_real` using the slowdown factor.
+- Match each `timestamp_real` window to the closest VTT line (±5 seconds) where possible.
+5. **Classify and label** every event as:
+- eva / evc
+- category
+- priority_level (1–16)
+- vtt_status (confirmed / rejected / video_only / unavailable)
+6. **Compute metrics**:
+- total_vtt_events
+- vtt_confirmed
+- vtt_rejected
+- video_only_events
+- vtt_accuracy as a percentage with 1 decimal (e.g., "66.7%").
+
+7. **Output format**
+- Produce **only a JSON object**, no extra text.
+- Use the exact JSON schema and field names defined in the SYSTEM PROFILE.
+- Sort the `events` array chronologically by `timestamp_video` ascending.
+- Use sequential IDs: `eva_01 -> eva_02 -> evc_01` (no gaps).
+- For the first event, set `prev_temporal` and `prev_causal` to "none".
+
+Scan priority events and verify the VTT for **this clip** now, then emit the final JSON immediately.

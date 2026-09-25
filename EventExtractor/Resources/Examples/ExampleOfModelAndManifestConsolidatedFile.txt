@@ -1,0 +1,180 @@
+{
+    "exportTimestamp": "2026-06-24T23:04:21Z",
+    "generatorVersion": "0",
+    "segments": [
+        {
+            "annotation": {
+                "file_name": "segment_001.json",
+                "file_path": "/Users/rrios/Downloads/EventExtractionDB/Pipeline-Test/224a7870-01dd-4211-8a4c-fe5b8a38331f/annotation_and_transcripts/annotationClips/segment_001.json",
+                "segment_index": 1,
+                "timing": {
+                    "endTimeSec": 100,
+                    "startTimeSec": 50
+                }
+            },
+            "audio_track": {
+                "audio_id": "c1c58bedb42f4d10b3569e386b991582318f1ef707cc62432a5b2acabd1942573f968532a70fbf07dd632faeaead4f0c3ac2",
+                "duration": 49.998367,
+                "end_time": 99.998367,
+                "file_path": "/Users/rrios/Downloads/EventExtractionDB/Pipeline-Test/224a7870-01dd-4211-8a4c-fe5b8a38331f/audio/audioClips/segment_001.mp3",
+                "segment_index": 1,
+                "start_time": 50,
+                "state": "OK"
+            },
+            "duration": 300.40655300000003,
+            "end_time": 600.406553,
+            "fullvideo_id": "",
+            "segment_id": "3c7ccc8fadb245dc8a24a8932403594f1ff3e50360f84f266000fd03d6331b623bae0b39c975d8a41ab30e6474f624715638",
+            "segment_index": 1,
+            "segment_path": "/Users/rrios/Downloads/EventExtractionDB/Pipeline-Test/224a7870-01dd-4211-8a4c-fe5b8a38331f/video/videoClips/segments-Gemini25_Flash5fps-5minCLip-6.0Slowdown/segment_gemini25_flash_5fps21crf_001.mp4",
+            "start_time": 300,
+            "state": "OK",
+            "vtt_transcript": {
+                "file_name": "segment_001.webvtt",
+                "file_path": "/Users/rrios/Downloads/EventExtractionDB/Pipeline-Test/224a7870-01dd-4211-8a4c-fe5b8a38331f/annotation_and_transcripts/transcriptClips/segment_001.webvtt",
+                "segment_index": 1,
+                "timing": {
+                    "endTimeSec": 100,
+                    "startTimeSec": 50
+                }
+            },
+            "ai_model_reports": [
+                {
+                    "video_clip_info": {
+                        "analysis_date": "",
+                        "clip_video_id": "a859a4453d184881817f3ba527a0e8e1a866b47e313a40121d3e9aad5bd5e15794e457366a193f806408d45bde1639020ea9",
+                        "clip_start_video": "00:30",
+                        "clip_end_video": "01:05",
+                        "slowdown_factor": 6,
+                        "priority_events_detected": [
+                            "PENALTY",
+                            "FOUL",
+                            "INJURY"
+                        ],
+                        "total_events": 3,
+                        "total_vtt_events": 4,
+                        "video_only_events": 2,
+                        "vtt_accuracy": "25.0%",
+                        "vtt_events_confirmed": 1,
+                        "vtt_events_rejected": 3,
+                        "vtt_verification": {
+                            "confirmed": [
+                                "00:00:27.824-00:00:47.779: pintou a 1º falta do jogo (Foul confirmed)"
+                            ],
+                            "rejected": [
+                                "00:00:03.504-00:00:12.409: Commentary (outside clip boundaries)",
+                                "00:00:12.409-00:00:27.824: Commentary (outside clip boundaries)",
+                                "00:00:48.240-00:00:59.064: Commentary (not a distinct visual event)"
+                            ],
+                            "missed_events_by_vtt": [
+                                "Penalty Kick",
+                                "Injury"
+                            ],
+                            "vtt_unavailable": "N/A"
+                        }
+                    },
+                    "events": [
+                        {
+                            "broadcasters": "N/A",
+                            "category": "FOUL",
+                            "confidence": "high",
+                            "description": "Bolivia #16 (J. Bejarano) slides in on Brazil #9 (Gabriel Jesus) inside the penalty area, making contact with the player's left leg after initial contact with the ball, causing him to fall.",
+                            "expert_analysis": "Law 12, Section 1: A direct free kick offence is committed when a player trips an opponent carelessly inside the penalty area. The slow-motion replay clearly shows Bejarano's left leg making contact with Gabriel Jesus's standing leg, causing the trip. The referee correctly identified a foul.",
+                            "id": "eva_01",
+                            "players": [
+                                "[#9, Brazil (Gabriel Jesus)]",
+                                "[#16, Bolivia (J. Bejarano)]"
+                            ],
+                            "prev_causal": "none",
+                            "prev_temporal": "none",
+                            "priority_level": 7,
+                            "referee_action": "Whistle blown, pointed to the penalty spot.",
+                            "timestamp_real": "[04:36-04:42]",
+                            "timestamp_video": "[00:46-00:47]",
+                            "timestamp_vtt": "[00:00:27.824-00:00:47.779]",
+                            "type": "Atomic (eva)",
+                            "verdict": "Foul, leading to a penalty kick.",
+                            "vtt_match": "Foul keyword",
+                            "vtt_source": "VTT line 3",
+                            "vtt_status": "confirmed"
+                        },
+                        {
+                            "broadcasters": "N/A",
+                            "category": "INJURY",
+                            "confidence": "high",
+                            "description": "Brazil #9 (Gabriel Jesus) remains on the ground, holding his left ankle/foot after the foul. Teammates and medical staff attend to him before he slowly rises.",
+                            "expert_analysis": "Law 5 requires the referee to stop play for a serious injury. While play was already stopped for the foul, the player's reaction indicates a potential injury requiring assessment, which is consistent with the referee allowing players to attend.",
+                            "id": "eva_02",
+                            "players": [
+                                "[#9, Brazil (Gabriel Jesus)]"
+                            ],
+                            "prev_causal": "eva_01",
+                            "prev_temporal": "eva_01",
+                            "priority_level": 7,
+                            "referee_action": "Allowed medical staff on field, monitored player.",
+                            "timestamp_real": "[04:42-05:36]",
+                            "timestamp_video": "[00:47-00:56]",
+                            "timestamp_vtt": "No VTT match",
+                            "type": "Atomic (eva)",
+                            "verdict": "Injury sustained, requiring brief attention.",
+                            "vtt_match": "N/A",
+                            "vtt_source": "video_only",
+                            "vtt_status": "video_only"
+                        },
+                        {
+                            "broadcasters": "N/A",
+                            "category": "PENALTY KICK",
+                            "confidence": "high",
+                            "description": "Following the foul on Brazil #9 inside the penalty area, the referee immediately awards a penalty kick and manages players as Brazil #10 (Neymar) prepares to take the kick.",
+                            "expert_analysis": "Law 14 states that a penalty kick is awarded if a direct free kick offence, as outlined in Law 12, is committed by a player inside their own penalty area. The referee's decision to award the penalty is consistent with the visual evidence of the foul. The subsequent actions involve setting up the penalty kick, including clearing the penalty area.",
+                            "id": "evc_01",
+                            "players": [
+                                "[#9, Brazil (Gabriel Jesus)]",
+                                "[#10, Brazil (Neymar)]",
+                                "[#16, Bolivia (J. Bejarano)]"
+                            ],
+                            "prev_causal": "eva_01",
+                            "prev_temporal": "eva_02",
+                            "priority_level": 2,
+                            "referee_action": "Pointed to the penalty spot, managed players, ensured area clearance.",
+                            "timestamp_real": "[04:42-06:30]",
+                            "timestamp_video": "[00:47-01:05]",
+                            "timestamp_vtt": "No VTT match",
+                            "type": "Compound (evc)",
+                            "verdict": "Penalty Kick awarded, preparation in progress.",
+                            "vtt_match": "N/A",
+                            "vtt_source": "video_only",
+                            "vtt_status": "video_only"
+                        }
+                    ],
+                    "role": "model",
+                    "finishReason": "STOP",
+                    "index": 0,
+                    "usageMetadata": {
+                        "promptTokenCount": 34236,
+                        "candidatesTokenCount": 1665,
+                        "totalTokenCount": 47850,
+                        "promptTokensDetails": [
+                            {
+                                "modality": "TEXT",
+                                "tokenCount": 3336
+                            },
+                            {
+                                "modality": "VIDEO",
+                                "tokenCount": 21300
+                            },
+                            {
+                                "modality": "AUDIO",
+                                "tokenCount": 9600
+                            }
+                        ],
+                        "thoughtsTokenCount": 11949,
+                        "serviceTier": "standard"
+                    },
+                    "modelVersion": "gemini-2.5-flash",
+                    "responseId": "fIw8avCPNr6f6dkPn8TqyAQ"
+                }
+            ]
+        }
+    ]
+}

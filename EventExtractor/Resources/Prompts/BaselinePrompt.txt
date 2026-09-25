@@ -1,0 +1,26 @@
+# BASELINE USER PROMPT (CONTROL GROUP)
+
+You are an AI assistant analyzing sports video. Watch the attached soccer video clip and read the matching commentary transcript provided below.
+
+Please identify and log all key soccer events that occur in this match segment, such as goals, fouls, cards, or penalties. Provide the timestamps for when these events happen based on the clip text or visual details.
+
+Ensure the video clip id ("clip_video_id": "The same received in input prompt") is in the response.
+
+A slow-motion factor of 1 or 0 (slowdown_factor=1 or slowdown_factor=0) means that the video is not in slow motion.
+
+### INPUT DATA:
+- clip_video_id: "{{clip_video_id}}"
+- clip_start_video: "{{clip_start_video}}" (HH:MM:SS in video time)
+- clip_end_video: "{{clip_end_video}}" (HH:MM:SS in video time)
+- slowdown_factor: {{slowdown_factor}}
+- Assumption: the video is slow‑motion at {{slowdown_factor}} FPS; use this to infer momentum between frames.
+
+2. **VTT input (timed text)**
+Paste the VTT‑style events here (or state "VTT is provided as a separate file"):
+
+{{paste_vtt_here}}
+
+3. **Optional visual context (if known)**
+- Camera angle: {{camera_angle}}
+- Visibility / lighting: {{visibility}}
+- Any known ambiguity: {{ambiguities}} (e.g., obscured offside, mixed camera angles)
