@@ -37,6 +37,89 @@ CENTERIS
 │   │   ├── UserPromptTemplate.txt
 ```
 
+
+
+## Configuration & API Credentials (secrets.ini)
+
+EventExtractor requires API keys to interact with external speech-to-text engines, vision-language backends, and storage providers. Credentials are read via QSettings from a configuration file named secrets.ini.
+
+---
+
+### File Location & Search Priority
+
+The loadSecretKey function scans for secrets.ini in the following order and uses the first existing file containing a valid, non-placeholder key:
+
+1. Current Working Directory:
+
+./secrets.ini
+
+2. System Application Configuration Directory (AppConfigLocation):
+* macOS: ~/Library/Application Support/EventExtractorApp/secrets.ini (or ~/Library/Preferences/EventExtractorApp/secrets.ini)
+* Linux: ~/.config/EventExtractorApp/secrets.ini
+* Windows: C:\Users<User>\AppData\Local\EventExtractorApp\secrets.ini
+
+
+3. Explicit User Home Directory:
+
+~/.config/EventExtractorApp/secrets.ini
+
+4. Application Executable Directory:
+
+<path_to_binary_dir>/secrets.ini
+
+---
+
+### Setup Instructions
+
+#### 1. Create the File
+
+Create the file in one of the search locations (such as the user config directory):
+
+```bash
+mkdir -p ~/.config/EventExtractorApp
+touch ~/.config/EventExtractorApp/secrets.ini
+```
+
+Set file permissions to protect private keys:
+
+```bash
+chmod 600 ~/.config/EventExtractorApp/secrets.ini
+```
+
+#### 2. Populate Credentials
+
+Populate secrets.ini using standard INI syntax ([Section] followed by Key=Value pairs). Values starting with YOUR_ are treated as unpopulated placeholders and skipped automatically.
+
+```text
+[Deepgram]
+ApiKey=ba06346bb74d...
+ProjectId=proj_12345
+
+[Google]
+GeminiApiKey=AIzaSy...
+HuggingFaceApiKey=hf_...
+OpenAPIEventProjKey=sk-proj-...
+
+[OpenAI]
+ApiKey=sk-proj-...
+GPT4oMiniApiKey=sk-proj-...
+OrganizationId=org-...
+ProjectId=proj-...
+
+[OpenRouter]
+ApiKey=sk-or-v1-...
+
+[Anthropic]
+ApiKey=sk-ant-...
+
+[Alibaba_Qwen]
+ApiKey=qwen-...
+
+[Database_Or_Storage]
+S3AccessKey=AKIA...
+S3SecretKey=wJalr...
+```
+
 ## Module Overview
 
 ### 1. `Logger`
