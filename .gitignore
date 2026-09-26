@@ -1,0 +1,87 @@
+# =================
+# Qt & Build Systems
+# =================
+# CMake build directories
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles/
+DartConfiguration.tcl
+Makefile
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
+_deps/
+build/
+build-*/
+
+# qmake build files and generated Makefiles
+.qmake.stash
+*.pro.user
+*.pro.user.*
+Makefile.*
+GeneratedFiles/
+debug/
+release/
+.qtcreator/
+
+# =================
+# Compiled Objects & Binaries
+# =================
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+*.app/
+
+# Qt Meta-Object Compiler (MOC), User Interface (UIC), and Resource (RCC) generated files
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+
+# =================
+# IDEs & Editors
+# =================
+# Xcode / macOS
+.DS_Store
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Qt Creator
+*.creator
+*.creator.user
+*.files
+*.includes
+*.config
+
+# =================
+# Logs & Temporary Files
+# =================
+*.log
+*.tmp
+*.temp
+.cache/
+
+##################################
+# Local configurations and secrets
+##################################
+secrets.ini
+EventExtraction-20260130-02h04min.h
+ObjectType.cpp
+ObjectType.h
+Old-Srcs&Inps/
+PythonFiles/bin/
+TestFiles/Brasil_x_Bolivia_Eliminatorias_da_Copa_2018_Jogo_Completo.mp4
+TestFiles/brasil.mp3
+TestFiles/brasil.wav
+TestFiles/result.json
+TestFiles/test-1.mp3
+
