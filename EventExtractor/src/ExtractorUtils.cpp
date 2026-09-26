@@ -1592,7 +1592,7 @@ qint32 ExtractorUtils::initCmdOptions(CmdArgumentsVec &cmdArgsVec, CmdLineOption
                 targetDirStr.isEmpty())
             {
                 missingArgs = true;
-                missingMsg += "Transcribe only:\n -m <mode> -a <audio_file> -s2t <audio_speech_2_text_model> -td <target_dir>"; // -s2t DeepgramS2TNova2GeneralEN
+                missingMsg += "Transcribe only:\n -m <mode> -a <audio_file> -s2tm <audio_speech_2_text_model> -td <target_dir>"; // -s2t DeepgramS2TNova2GeneralEN
             }
 
             break;
@@ -1659,6 +1659,7 @@ qint32 ExtractorUtils::initCmdOptions(CmdArgumentsVec &cmdArgsVec, CmdLineOption
             if (inputFileStr.isEmpty() ||
                 outputAudioFormatStr.isEmpty() ||
                 (cmdOptions->clipDuration <= 0.00) ||
+                (cmdOptions->speech2TextModel == Deepgram_AIS2TT2SModels_t::NONE) ||
                 (cmdOptions->aiModelType == AIModels_t::None) ||
                 cmdOptions->slowdownFactors.isEmpty() ||
                 (!cmdOptions->searchedTerms.isEmpty() &&
@@ -1671,7 +1672,7 @@ qint32 ExtractorUtils::initCmdOptions(CmdArgumentsVec &cmdArgsVec, CmdLineOption
                 )
             {
                 missingArgs = true;
-                missingMsg += "entire pipeline:\n -m <mode> -i <video_file> -af <audio_format> -s2t <audio_speech_2_text_model> -convType <converter_type> -vsm <video_seg_mode> -cd <clip_duration> -aim <ai_model_type> -sf <slowdown_factors> -ta <task_analisis> -sp <system_profile> -st <searched_terms> -sType <search_type> -ct <confidence_threshold> -td <target_dir>";
+                missingMsg += "entire pipeline:\n -m <mode> -i <video_file> -af <audio_format> -s2tm <audio_speech_2_text_model> -convType <converter_type> -vsm <video_seg_mode> -cd <clip_duration> -aim <ai_model_type> -sf <slowdown_factors> -ta <task_analisis> -sp <system_profile> -st <searched_terms> -sType <search_type> -ct <confidence_threshold> -td <target_dir>";
             }
         }
 

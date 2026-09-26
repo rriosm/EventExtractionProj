@@ -928,9 +928,9 @@ inline uint qHash(const ConverterType_t type, uint seed = 0)
 }
 
 static const QHash<ConverterType_t, QString> TranscriptionConverterMap = {
-    {ConverterType_t::None, "none"},
-    {ConverterType_t::DeepgramWebVttConverter, "DeepgramWebVttConverter"},
-    {ConverterType_t::DeepgramSRTConverter, "DeepgramWebVttConverter"}
+    {ConverterType_t::None,                     "none"},
+    {ConverterType_t::DeepgramWebVttConverter,  "DeepgramWebVttConverter"},
+    {ConverterType_t::DeepgramSRTConverter,     "DeepgramWebVttConverter"}
 };
 
 #endif
