@@ -1857,6 +1857,9 @@ qint32 ExtractorUtils::initCmdOptions(CmdArgumentsVec &cmdArgsVec, CmdLineOption
         auto ensureDir = [](const QFileInfo &dirInfo,
                             qint32 errCode,
                             const QString &logName) -> qint32 {
+#ifndef QT_DEBUG
+            Q_UNUSED(logName)
+#endif
             QDir d;
 
             if (!d.exists(dirInfo.absoluteFilePath()) && !d.mkpath(dirInfo.absoluteFilePath()))

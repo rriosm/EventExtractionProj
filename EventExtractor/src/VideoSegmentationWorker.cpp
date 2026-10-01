@@ -809,7 +809,9 @@ void VideoSegmentationWorker::runFFmpegPipeline()
         emit error(e.what());
     }
 
+#ifdef QT_DEBUG
     qint64 totalElapsedMs = timer.elapsed();
+#endif
     av_packet_free(&pkt);
     av_frame_free(&frame);
     av_frame_free(&filt_frame);

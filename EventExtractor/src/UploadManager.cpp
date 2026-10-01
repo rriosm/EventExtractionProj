@@ -62,7 +62,10 @@ using QFilePtr = std::unique_ptr<QFile, QFileDeleter>;
 
 #include <QThread>
 
+#ifdef QT_DEBUG
 #include "inc/LogUtils.h"
+#endif
+
 #include "inc/ExtractorUtils.h"
 #include "inc/UploadManager.h"
 
@@ -227,7 +230,9 @@ void UploadManager::clearAllRemoteFiles()
 
     QString pageToken = "";
     bool hasMorePages = true;
+#ifdef QT_DEBUG
     qint32 totalDeleted = 0;
+#endif
 
     // --- PAGINATION LOOP ---
     while (hasMorePages)
@@ -313,8 +318,9 @@ void UploadManager::clearAllRemoteFiles()
 
                 if (http_code == 200)
                 {
-                    totalDeleted++;
 #ifdef QT_DEBUG
+                    totalDeleted++;
+
                     LogUtils::safeLog(QString("UploadManager::startQueue() - Deleted %1 (%2 total)")
                                           .arg(fileName)
                                       .arg(totalDeleted),

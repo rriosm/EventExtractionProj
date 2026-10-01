@@ -341,9 +341,9 @@ void AudioSegmentationController::handleFinished(qint32 exitCode, qint32 status)
 
     if (success && this->audioModel())
     {
+#ifdef QT_DEBUG
         int count = this->audioModel()->rowCount();
 
-#ifdef QT_DEBUG
         LogUtils::safeLog(QString("AudioSegmentationController::handleFinished() - Final audio segment count: %1")
                               .arg(count),
                           __FILE__,

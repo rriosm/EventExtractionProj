@@ -16,12 +16,6 @@ using namespace utils;
 #include <QMimeDatabase>
 #include <QProcessEnvironment>
 
-// Deepgram Key = 4e6866bcfcb9ed520189b68350e9a708295e1093
-// Name: AI-AudioTranscription
-// Tag: env-AINEMo
-
-//Q_GLOBAL_STATIC_WITH_ARGS(const QString, DeepgramKey_Str, ("Token 3c2d450f4fde7898ba831f683558c1ee590e61c7"));
-
 #ifndef USE_LIBCURL
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -83,6 +77,10 @@ int AudioTranscriptionWorker::progress_callback(void *clientp, curl_off_t dltota
     // ultotal/ulnow are for uploads (Speech2Text)
     // dltotal/dlnow are for downloads (Text2Speech)
 
+#ifndef QT_DEBUG
+    Q_UNUSED(dlnow)
+#endif
+
     AudioTranscriptionWorker* instance = static_cast<AudioTranscriptionWorker*>(clientp);
 
     if (!instance) return 0;
@@ -109,9 +107,9 @@ int AudioTranscriptionWorker::progress_callback(void *clientp, curl_off_t dltota
 
     } else if (dltotal > 0)
     {
+#ifdef QT_DEBUG
         double progress = (double)dlnow / (double)dltotal * 100.0;
 
-#ifdef QT_DEBUG
         LogUtils::safeLog(QString("Download Progress: %1%").arg(progress, 0, 'f', 2),
                           __FILE__,
                           __LINE__,
@@ -767,7 +765,7 @@ void AudioTranscriptionWorker::processText2Speech(const QString &text)
 }
 
 #ifndef USE_LIBCURL
-void TranscribeAudio::handleS2TResponse(QNetworkReply *reply, const QString &destPath)
+void AudioTranscriptionWorker::handleS2TResponse(QNetworkReply *reply, const QString &destPath)
 {
     reply->deleteLater();
 
@@ -788,7 +786,7 @@ void TranscribeAudio::handleS2TResponse(QNetworkReply *reply, const QString &des
     emit finished();
 }
 
-void TranscribeAudio::handleT2SResponse(QNetworkReply *reply, std::shared_ptr<QFile> destFile)
+void AudioTranscriptionWorker::handleT2SResponse(QNetworkReply *reply, std::shared_ptr<QFile> destFile)
 {
     reply->deleteLater();
 

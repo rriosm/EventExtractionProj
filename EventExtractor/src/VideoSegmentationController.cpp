@@ -530,10 +530,10 @@ void VideoSegmentationController::handleFinished(qint32 exitCode, qint32 status)
     // you would do it here before the UI is considered "Done"
     if (success && this->videoSegModel())
     {
+#ifdef QT_DEBUG
         // Example: Log how many segments were actually found
         qint32 count = this->videoSegModel()->rowCount();
 
-#ifdef QT_DEBUG
         LogUtils::safeLog(QString("Final segment count: %1").arg(count),
                           __FILE__,
                           __LINE__,
