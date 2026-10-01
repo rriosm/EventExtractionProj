@@ -77,7 +77,7 @@ secrets.ini
 EventExtraction-20260130-02h04min.h
 ObjectType.cpp
 ObjectType.h
-EventExtractor/
+EventExtractor/src/OldMainFunctions.cpp
 Old-Srcs&Inps/
 PythonFiles/bin/
 TestFiles/Brasil_x_Bolivia_Eliminatorias_da_Copa_2018_Jogo_Completo.mp4
