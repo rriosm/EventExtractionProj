@@ -4,22 +4,6 @@
 #
 #-------------------------------------------------
 
-# Read the document at https://doc.qt.io/qt-5/debug.html
-
-# macx {
-#     QMAKE_MAC_SDK = macosx
-#     # QMAKE_MAC_SDK = macosx10.15
-#     # QMAKE_MAC_SDK = macosx14.5
-#     # CONFIG += sdk_no_version_check
-
-#     # 1. Deployment Target (OS Compatibility)
-#     QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
-
-#     # 2. Relax the compiler (Compiler Compatibility)
-#     # This disables the specific warning about strict flags that broke your QIODevice code
-#     # QMAKE_CXXFLAGS += -Wno-deprecated-declarations -Wno-ambiguous-member-template
-# }
-
 #----------------------------------------------------------------------
 # Project Configuration
 #----------------------------------------------------------------------
@@ -68,26 +52,6 @@ CONFIG(debug, debug|release) {
                QT_NO_WARNING_OUTPUT # \
                # QT_MESSAGELOGCONTEXT
 }
-
-# ----------------------------------------------------------------------
-# macOS Specific Toolchain & Runtime Settings
-# ----------------------------------------------------------------------
-# macx {
-#     # Optional: Log the exact SDK path and version to Qt Creator compile output
-#     _SDK_PATH = $$system(/usr/bin/xcrun --sdk macosx --show-sdk-path 2>/dev/null)
-#     _SDK_VER  = $$system(/usr/bin/xcrun --sdk macosx --show-sdk-version 2>/dev/null)
-
-#     !isEmpty(_SDK_VER) {
-#         message("Building with macOS SDK: $$_SDK_VER at $$_SDK_PATH")
-#     }
-
-#     # Optional: Resolve the exact SDK filesystem sysroot path
-#     QMAKE_MAC_SDK_PATH = $$system(/usr/bin/xcrun --sdk macosx --show-sdk-path 2>/dev/null)
-
-#     !isEmpty(QMAKE_MAC_SDK_PATH) {
-#         message("SDK Path: $$QMAKE_MAC_SDK_PATH")
-#     }
-# }
 
 #----------------------------------------------------------------------
 # Installation & Distribution Rules (POSIX / Unix / macOS)

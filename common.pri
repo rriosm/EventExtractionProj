@@ -58,7 +58,16 @@ macx {
     # Let Xcode resolve the installed SDK dynamically via the unversioned alias.
     # Apple's clang & xcrun map 'macosx' to whatever active macOS SDK is installed
     # (in your case, Xcode 11.7's macOS 10.15 SDK).
-    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
+    # QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
+    # QMAKE_MACOSX_DEPLOYMENT_TARGET = 14.0
+    # Explicitly enforce deployment target on compiler and linker passes
+    # QMAKE_CFLAGS   += -mmacosx-version-min=14.0
+    # QMAKE_CXXFLAGS += -mmacosx-version-min=14.0
+    # QMAKE_LFLAGS   += -mmacosx-version-min=14.0
+
+    # 1. Force Clang to use LLVM's libc++
+    QMAKE_CXXFLAGS += -stdlib=libc++
+    QMAKE_LFLAGS   += -stdlib=libc++
 
     # Optional: Log the exact SDK path and version to Qt Creator compile output
     _SDK_PATH = $$system(/usr/bin/xcrun --sdk macosx --show-sdk-path 2>/dev/null)
@@ -73,9 +82,22 @@ macx {
 
     !isEmpty(QMAKE_MAC_SDK_PATH) {
         message("SDK Path: $$QMAKE_MAC_SDK_PATH")
+        QMAKE_CXXFLAGS += -isysroot $$QMAKE_MAC_SDK_PATH
+        QMAKE_LFLAGS   += -isysroot $$QMAKE_MAC_SDK_PATH
     }
 
     # Compiler warnings / flags
     QMAKE_CXXFLAGS += -Wno-deprecated-declarations \
-                      -Wno-ambiguous-member-template
+                      -Wno-ambiguous-member-template \
+                      -Wno-#warnings
+
+    # Silence libc++ header deprecations
+    DEFINES += _LIBCPP_DISABLE_DEPRECATION_WARNINGS \
+               _LIBCPP_DISABLE_AVAILABILITY
+
+    # Strip obsolete linker flags injected by Qt 5 macOS mkspecs
+    QMAKE_LFLAGS_SHLIB  -= -single_module
+    QMAKE_LFLAGS_PLUGIN -= -single_module
+    QMAKE_LFLAGS        -= -single_module
+    QMAKE_LFLAGS        += -Wl,-w
 }

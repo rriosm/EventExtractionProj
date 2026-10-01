@@ -55,7 +55,7 @@ CONFIG(build_tests) {
     QT += testlib
     DEFINES += BUILD_TESTS
 
-    INCLUDEPATH += $$PWD/tests/inc
+    INCLUDEPATH += tests/inc
 
     HEADERS += \
         tests/inc/AIModelsTest.h \
@@ -76,7 +76,7 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,, -debug)
     LIBLOGGER = Logger-debug
     LIBUTILS  = Utils-debug
-    DEFINES  += QT_DEBUG DEBUG_MODE USE_LIBCURL
+    DEFINES  += QT_DEBUG DEBUG_MODE
 } else {
     LIBLOGGER = Logger
     LIBUTILS  = Utils
@@ -240,8 +240,8 @@ HEADERS += \
     # tests/inc/AIModelsTest.h \
     # tests/inc/ChatHistory-Test.h \
     # tests/inc/VideoSegmentaInfoTest.h \
-#        \
-#        inc/AudioEtiandRe.h
+    # \
+    # inc/AudioEtiandRe.h
 
 SOURCES += \
     src/ExtractorUtils.cpp \

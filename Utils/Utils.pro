@@ -77,9 +77,13 @@ LIBS += -L$$LIB_DESTDIR \
 # ----------------------------------------------------------------------
 macx {
     # Ensure this library looks in its own directory and standard locations for Logger
-    QMAKE_LFLAGS += -Wl,-rpath,@loader_path/ \
-                    -Wl,-rpath,@executable_path/../Frameworks \
-                    -Wl,-rpath,$$LIB_DESTDIR
+    # QMAKE_LFLAGS += -Wl,-rpath,@loader_path/ \
+    #                 -Wl,-rpath,@executable_path/../Frameworks \
+    #                 -Wl,-rpath,$$LIB_DESTDIR
+
+    # Use QMAKE_RPATHDIR to let qmake deduplicate rpaths cleanly
+    QMAKE_RPATHDIR += @loader_path/ \
+                      $$LIB_DESTDIR
 }
 
 # ----------------------------------------------------------------------
