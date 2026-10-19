@@ -45,12 +45,23 @@ DESTDIR = $$LIB_DESTDIR
 CONFIG(debug, debug|release) {
     # Distinguish debug binary name (e.g., libLogger-debug.dylib / libLogger-debug.so)
     TARGET = $$join(TARGET,,, -debug)
+    DEFINES += DEBUG_MODE
 } else {
     # Suppress console logging in release builds
     DEFINES += QT_NO_DEBUG_OUTPUT \
                QT_NO_INFO_OUTPUT \
                QT_NO_WARNING_OUTPUT # \
                # QT_MESSAGELOGCONTEXT
+}
+
+HDR_DEST = $$INC_DESTDIR/Logger
+!exists($$HDR_DEST): mkpath($$HDR_DEST)
+
+# Ensure the directory exists at make-time, then copy headers
+QMAKE_POST_BUILD += $$QMAKE_MKDIR $$shell_path($$HDR_DEST) $$escape_expand(\n\t)
+
+for(header, HEADERS) {
+    QMAKE_POST_BUILD += $$QMAKE_COPY $$shell_path($$PWD/$$header) $$shell_path($$HDR_DEST) $$escape_expand(\n\t)
 }
 
 #----------------------------------------------------------------------

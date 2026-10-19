@@ -54,8 +54,11 @@ DESTDIR = $$LIB_DESTDIR
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,, -debug)
+    BUILD_CONF = Debug
     LIBLOGGER = Logger-debug
+    DEFINES  += DEBUG_MODE
 } else {
+    BUILD_CONF = Release
     LIBLOGGER = Logger
     DEFINES += QT_NO_DEBUG_OUTPUT \
                QT_NO_INFO_OUTPUT \
@@ -63,14 +66,34 @@ CONFIG(debug, debug|release) {
                # QT_MESSAGELOGCONTEXT
 }
 
+# Fallback in case common.pri was not reloaded
+isEmpty(INC_DESTDIR): INC_DESTDIR = $$clean_path($$OUT_PWD/../include/$$BUILD_CONF)
+
 # ----------------------------------------------------------------------
 # Internal Dependency: Logger
 # ----------------------------------------------------------------------
-INCLUDEPATH += $$PWD/../Logger/inc
-DEPENDPATH  += $$PWD/../Logger/inc
+# INCLUDEPATH += $$PWD/../Logger/inc
+INCLUDEPATH += $$INC_DESTDIR \
+               $$INC_DESTDIR/Logger
+
+DEPENDPATH  += $$INC_DESTDIR/Logger \
+               $$PWD/../Logger/inc
 
 LIBS += -L$$LIB_DESTDIR \
         -l$${LIBLOGGER}
+
+# ----------------------------------------------------------------------
+# Public Header Staging (No INSTALLS to avoid path doubling)
+# ----------------------------------------------------------------------
+HDR_DEST = $$INC_DESTDIR/Utils
+!exists($$HDR_DEST): mkpath($$HDR_DEST)
+
+# Ensure the directory exists at make-time, then copy headers
+QMAKE_POST_BUILD += $$QMAKE_MKDIR $$shell_path($$HDR_DEST) $$escape_expand(\n\t)
+
+for(header, HEADERS) {
+    QMAKE_POST_BUILD += $$QMAKE_COPY $$shell_path($$PWD/$$header) $$shell_path($$HDR_DEST) $$escape_expand(\n\t)
+}
 
 # ----------------------------------------------------------------------
 # Platform: macOS Configuration
@@ -92,7 +115,7 @@ macx {
 unix {
     # ------------------------------------------------------------------
     # 1. Define Base Install Prefix (Override via command line if needed)
-    #    Usage: qmake PREFIX=/opt/local Logger.pro
+    #    Usage: qmake PREFIX=/opt/local Utils.pro
     # ------------------------------------------------------------------
     !defined(PREFIX, var) {
         # Default to /usr/local for macOS command-line/dev builds
@@ -120,7 +143,7 @@ unix {
     !isEmpty(BUNDLE_PATH) {
         bundle_fw.path  = $$BUNDLE_PATH/Contents/Frameworks
         bundle_fw.files = $$DESTDIR/lib$${TARGET}*
-        INSTALLS += bundle_fw
+        INSTALLS       += bundle_fw
     }
 
     # ------------------------------------------------------------------
@@ -134,7 +157,7 @@ unix {
     QMAKE_PKGCONFIG_INCDIR      = $$PREFIX/include
     QMAKE_PKGCONFIG_DESTDIR     = pkgconfig
 
-    pkgconfig.path = $$PREFIX/lib/pkgconfig
+    pkgconfig.path  = $$PREFIX/lib/pkgconfig
     pkgconfig.files = $$OUT_PWD/pkgconfig/Utils.pc
-    INSTALLS += pkgconfig
+    INSTALLS       += pkgconfig
 }

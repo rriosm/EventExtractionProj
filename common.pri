@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 
 # Modern C++ standard (use c++11 if your toolchain allows)
-CONFIG += c++11
+CONFIG += c++17
 
 # Keep generated files organized outside the source tree
 OBJECTS_DIR = $$OUT_PWD/.obj
@@ -13,13 +13,17 @@ UI_DIR      = $$OUT_PWD/.ui
 
 # Unified output destinations for the entire workspace
 CONFIG(debug, debug|release) {
-    BUILD_MODE = debug
-    LIB_DESTDIR = $$OUT_PWD/../lib/Debug
-    BIN_DESTDIR = $$OUT_PWD/../bin/Debug
+    BUILD_MODE  = debug
+    BUILD_CONF  = Debug
+    LIB_DESTDIR = $$clean_path($$OUT_PWD/../lib/Debug)
+    BIN_DESTDIR = $$clean_path($$OUT_PWD/../bin/Debug)
+    INC_DESTDIR = $$clean_path($$OUT_PWD/../include/Debug)
 } else {
-    BUILD_MODE = release
-    LIB_DESTDIR = $$OUT_PWD/../lib/Release
-    BIN_DESTDIR = $$OUT_PWD/../bin/Release
+    BUILD_MODE  = release
+    BUILD_CONF  = Release
+    LIB_DESTDIR = $$clean_path($$OUT_PWD/../lib/Release)
+    BIN_DESTDIR = $$clean_path($$OUT_PWD/../bin/Release)
+    INC_DESTDIR = $$clean_path($$OUT_PWD/../include/Release)
 }
 
 # ----------------------------------------------------------------------
@@ -41,6 +45,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # ----------------------------------------------------------------------
 # macOS Portability Defaults
 macx {
+    # Let Xcode resolve the installed SDK dynamically via the unversioned alias.
+    # Apple's clang & xcrun map 'macosx' to whatever active macOS SDK is installed.
     QMAKE_MAC_SDK = macosx
 
     # Set library ID to @rpath so consumers can relocate it cleanly
@@ -60,10 +66,12 @@ macx {
     # (in your case, Xcode 11.7's macOS 10.15 SDK).
     # QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
     # QMAKE_MACOSX_DEPLOYMENT_TARGET = 14.0
-    # Explicitly enforce deployment target on compiler and linker passes
-    # QMAKE_CFLAGS   += -mmacosx-version-min=14.0
-    # QMAKE_CXXFLAGS += -mmacosx-version-min=14.0
-    # QMAKE_LFLAGS   += -mmacosx-version-min=14.0
+
+    # Alignment with Qt 5.15 / macOS Sonoma baseline
+    isEmpty(QMAKE_MACOSX_DEPLOYMENT_TARGET): QMAKE_MACOSX_DEPLOYMENT_TARGET = 14.0
+    QMAKE_CFLAGS   += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
+    QMAKE_CXXFLAGS += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
+    QMAKE_LFLAGS   += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
 
     # 1. Force Clang to use LLVM's libc++
     QMAKE_CXXFLAGS += -stdlib=libc++
@@ -88,8 +96,8 @@ macx {
 
     # Compiler warnings / flags
     QMAKE_CXXFLAGS += -Wno-deprecated-declarations \
-                      -Wno-ambiguous-member-template \
-                      -Wno-#warnings
+                      -Wno-ambiguous-member-template #\
+                      # -Wno-#warnings
 
     # Silence libc++ header deprecations
     DEFINES += _LIBCPP_DISABLE_DEPRECATION_WARNINGS \
