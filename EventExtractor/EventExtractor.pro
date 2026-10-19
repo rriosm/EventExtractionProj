@@ -74,17 +74,22 @@ CONFIG(build_tests) {
 # ----------------------------------------------------------------------
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,, -debug)
-    LIBLOGGER = Logger-debug
-    LIBUTILS  = Utils-debug
-    DEFINES  += QT_DEBUG DEBUG_MODE
+    BUILD_CONF = Debug
+    LIBLOGGER  = Logger-debug
+    LIBUTILS   = Utils-debug
+    DEFINES   += QT_DEBUG DEBUG_MODE
 } else {
-    LIBLOGGER = Logger
-    LIBUTILS  = Utils
-    DEFINES  += QT_NO_DEBUG_OUTPUT \
-                QT_NO_INFO_OUTPUT \
-                QT_NO_WARNING_OUTPUT #\
-                # QT_LOGMESSAGELOGCONTEXT
+    BUILD_CONF = Release
+    LIBLOGGER  = Logger
+    LIBUTILS   = Utils
+    DEFINES   += QT_NO_DEBUG_OUTPUT \
+                 QT_NO_INFO_OUTPUT \
+                 QT_NO_WARNING_OUTPUT #\
+                 # QT_LOGMESSAGELOGCONTEXT
 }
+
+# Fallback in case common.pri was not reloaded
+isEmpty(INC_DESTDIR): INC_DESTDIR = $$clean_path($$OUT_PWD/../include/$$BUILD_CONF)
 
 # ----------------------------------------------------------------------
 # Compiler & Platform Settings (macOS)
@@ -166,28 +171,38 @@ CONFIG(use_libcurl) {
 # ----------------------------------------------------------------------
 # Internal Dependencies: Logger & Utils (Resolves against Staging)
 # ----------------------------------------------------------------------
-INCLUDEPATH += $$PWD/inc \
-               $$PWD/../Logger/inc \
-               $$PWD/../Utils/inc
+# INCLUDEPATH += $$PWD/inc \
+#                $$PWD/../Logger/inc \
+#                $$PWD/../Utils/inc
 
-LIBS += -L$$LIB_DESTDIR -l$${LIBLOGGER} -l$${LIBUTILS}
+INCLUDEPATH += $$INC_DESTDIR \
+               $$INC_DESTDIR/Logger \
+               $$INC_DESTDIR/Utils \
+               $$PWD/inc
+
+DEPENDPATH  += $$INC_DESTDIR/Logger \
+               $$INC_DESTDIR/Utils \
+               $$PWD/inc
+
+LIBS += -L$$LIB_DESTDIR \
+        -l$${LIBLOGGER} \
+        -l$${LIBUTILS}
 
 # Embed relative rpaths so the binary resolves libraries placed next to it or in ../lib
 macx {
     QMAKE_RPATHDIR += $$LIB_DESTDIR \
                       @executable_path/ \
-                      @executable_path/../lib \
+                      @executable_path/../../lib/$$BUILD_CONF \
                       @loader_path/
 } else:unix {
     QMAKE_RPATHDIR += $$LIB_DESTDIR \
                       \$\$ORIGIN \
-                      \$\$ORIGIN/../lib
+                      \$\$ORIGIN/../../lib/$$BUILD_CONF
 }
 
 # ----------------------------------------------------------------------
 # Project Files & Directories
 # ----------------------------------------------------------------------
-INCLUDEPATH += $$PWD/inc
 
 HEADERS += \
     inc/Actor.h \
@@ -308,16 +323,13 @@ DISTFILES += \
 # ----------------------------------------------------------------------
 # Installation Target
 # ----------------------------------------------------------------------
-macx {
+unix {
     !defined(PREFIX, var) {
-        PREFIX = /usr/local
+        macx: PREFIX = /usr/local
+        else: PREFIX = /usr
     }
 
-    !isEmpty(PREFIX) {
-        target.path = $$PREFIX/bin
-    } else {
-        target.path = /bin
-    }
+    target.path = $$PREFIX/bin
 
     INSTALLS += target
 }
