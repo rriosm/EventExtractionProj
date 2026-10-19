@@ -30,12 +30,17 @@ inline QString loadSecretKey(const QString &section, const QString &keyName, con
 {
     const QString settingPath = section.isEmpty() ? keyName : (section + "/" + keyName);
 
-    const QStringList searchPaths = {
+    QStringList searchPaths = {
         QDir::current().filePath("secrets.ini"),
-        QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/secrets.ini",
         QDir::home().filePath(".config/EventExtractorApp/secrets.ini"),
-        QCoreApplication::applicationDirPath() + "/secrets.ini"
     };
+
+    // Only query application-dependent locations if QCoreApplication is already instantiated
+    if (QCoreApplication::instance() != nullptr)
+    {
+        searchPaths.prepend(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/secrets.ini");
+        searchPaths.append(QCoreApplication::applicationDirPath() + "/secrets.ini");
+    }
 
     for (const QString &path : searchPaths)
     {
@@ -231,14 +236,39 @@ namespace Constants {
     Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_URLHeaderContentTypeTemplate_Str,            ("Content-Type: <CONTENT_TYPE>"));
 
 
-    const QString result01 = loadFromFileDefs(":/Resources/Result01");
+    inline const QString& getResult01()
+    {
+        static const QString s = loadFromFileDefs(":/Resources/Result01");
 
-    const QString result2 = loadFromFileDefs(":/Resources/Result02");
+        return s;
+    }
 
-    const QString request01 = loadFromFileDefs(":/Resources/Request01");;
+#define result01 (getResult01())
 
-    const QString curlPost = loadFromFileDefs(":/Resources/CurlPost01");
+    inline const QString& getResult02()
+    {
+        static const QString s = loadFromFileDefs(":/Resources/Result02");
 
+        return s;
+    }
+
+#define result2 (getResult02())
+
+    inline const QString& getRequest01()
+    {
+        static const QString s = loadFromFileDefs(":/Resources/Request01");
+        return s;
+    }
+
+#define request01 (getRequest01())
+
+    inline const QString& getCurlPost()
+    {
+        static const QString s = loadFromFileDefs(":/Resources/CurlPost01");
+        return s;
+    }
+
+#define curlPost (getCurlPost())
 
     Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_PipelineModeNone,                            ("none"));
     Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_PipelineModeTranscode,                       ("transcode_only"));
@@ -417,8 +447,11 @@ namespace Constants {
     Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_HIGH_PASS,                               ("HIGH PASS"));
     Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_SUBSTITUTION,                            ("SUBSTITUTION"));
     Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_SHOT,                                    ("SHOT"));
+    Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_SHOTS_ON_TARGET,                         ("SHOTS ON TARGET"));
+    Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_SHOTS_OFF_TARGET,                        ("SHOTS OFF TARGET"));
     Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_THROW_IN,                                ("THROW-IN"));
 
+    Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_KICK_OFF,                                ("KICK-OFF"));
     Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_FREE_KICK,                               ("FREE KICK"));
     Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_CORNER,                                  ("CORNER"));
     Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_CORNER_KICK,                             ("CORNER KICK"));
@@ -432,8 +465,10 @@ namespace Constants {
     Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_OUT,                                     ("OUT"));
     Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_CROSS,                                   ("CROSS"));
     Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_BALL,                                    ("BALL"));
+    Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_BALL_OUT_OF_PLAY,                        ("BALL OUT OF PLAY"));
     Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_OFFSIDE_CALL,                            ("OFFSIDE CALL"));
 
+    Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_CLEARANCE,                               ("CLEARANCE"));
     Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_INJURY_TIMEOUT,                          ("INJURY TIMEOUT"));
     Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_DRIVE,                                   ("DRIVE"));
     Q_GLOBAL_STATIC_WITH_ARGS(const QString, Q_QGS_CAT_HEADER,                                  ("HEADER"));
@@ -1114,99 +1149,158 @@ inline uint qHash(const AIModels_t type, uint seed = 0)
 // Mapping table to eliminate the massive switch
 struct AIModelConfig { QString name; Url url; QString key; };
 
-static const QHash<AIModels_t, AIModelConfig> AIModelMap = {
-    { AIModels_t::Google_Gemini_API_20FlashLite,                    { *Constants::Q_QGS_GoogleGemini20FlashLite_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
-    { AIModels_t::Google_Gemini_API_20FlashLite001,                 { *Constants::Q_QGS_GoogleGemini20FlashLite001_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
-    { AIModels_t::Google_Gemini_API_20Flash,                        { *Constants::Q_QGS_GoogleGemini20Flash_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
-    { AIModels_t::Google_Gemini_API_20Flash001,                     { *Constants::Q_QGS_GoogleGemini20Flash001_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
+/**
+ * @brief getAIModelMap
+ * @return
+ */
+inline const QHash<AIModels_t, AIModelConfig>& getAIModelMap()
+{
+    static const QHash<AIModels_t, AIModelConfig> s_map = {
+        { AIModels_t::Google_Gemini_API_20FlashLite,                    { *Constants::Q_QGS_GoogleGemini20FlashLite_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
+        { AIModels_t::Google_Gemini_API_20FlashLite001,                 { *Constants::Q_QGS_GoogleGemini20FlashLite001_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
+        { AIModels_t::Google_Gemini_API_20Flash,                        { *Constants::Q_QGS_GoogleGemini20Flash_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
+        { AIModels_t::Google_Gemini_API_20Flash001,                     { *Constants::Q_QGS_GoogleGemini20Flash001_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
 
-    { AIModels_t::Google_Gemini_API_25Flash,                        { *Constants::Q_QGS_GoogleGemini25Flash_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
-    { AIModels_t::Google_Gemini_API_25FlashLite,                    { *Constants::Q_QGS_GoogleGemini25FlashLite_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
+        { AIModels_t::Google_Gemini_API_25Flash,                        { *Constants::Q_QGS_GoogleGemini25Flash_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
+        { AIModels_t::Google_Gemini_API_25FlashLite,                    { *Constants::Q_QGS_GoogleGemini25FlashLite_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
 
-    { AIModels_t::Google_Gemini_API_25Pro,                          { *Constants::Q_QGS_GoogleGemini25Pro_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
+        { AIModels_t::Google_Gemini_API_25Pro,                          { *Constants::Q_QGS_GoogleGemini25Pro_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
 
-    { AIModels_t::Google_Gemini_API_3FlashPreview,                  { *Constants::Q_QGS_GoogleGemini3FlashPreview_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
+        { AIModels_t::Google_Gemini_API_3FlashPreview,                  { *Constants::Q_QGS_GoogleGemini3FlashPreview_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
 
-    { AIModels_t::Google_Gemini_API_31FlashLite,                    { *Constants::Q_QGS_GoogleGemini31FlashLite_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
-    { AIModels_t::Google_Gemini_API_31FlashLitePreview,             { *Constants::Q_QGS_GoogleGemini31FlashLitePreview_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
+        { AIModels_t::Google_Gemini_API_31FlashLite,                    { *Constants::Q_QGS_GoogleGemini31FlashLite_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
+        { AIModels_t::Google_Gemini_API_31FlashLitePreview,             { *Constants::Q_QGS_GoogleGemini31FlashLitePreview_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
 
-    { AIModels_t::Google_Gemini_API_35Flash,                        { *Constants::Q_QGS_GoogleGemini35Flash_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
+        { AIModels_t::Google_Gemini_API_35Flash,                        { *Constants::Q_QGS_GoogleGemini35Flash_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
 
-    { AIModels_t::Google_Gemini_API_FlashLiteLatest,                { *Constants::Q_QGS_GoogleGeminiFlashLiteLatest_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
-    { AIModels_t::Google_Gemini_API_FlashLatest,                    { *Constants::Q_QGS_GoogleGeminiFlashLatest_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
+        { AIModels_t::Google_Gemini_API_FlashLiteLatest,                { *Constants::Q_QGS_GoogleGeminiFlashLiteLatest_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
+        { AIModels_t::Google_Gemini_API_FlashLatest,                    { *Constants::Q_QGS_GoogleGeminiFlashLatest_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
 
-    { AIModels_t::Google_Gemini_API_3ProPreview,                    { *Constants::Q_QGS_GoogleGemini3ProPreview_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
+        { AIModels_t::Google_Gemini_API_3ProPreview,                    { *Constants::Q_QGS_GoogleGemini3ProPreview_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
 
-    { AIModels_t::Google_Gemini_API_31ProPreview,                   { *Constants::Q_QGS_GoogleGemini31ProPreview_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
-    { AIModels_t::Google_Gemini_API_31ProPreviewCustomTools,        { *Constants::Q_QGS_GoogleGemini3ProPreviewCustomTools_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
+        { AIModels_t::Google_Gemini_API_31ProPreview,                   { *Constants::Q_QGS_GoogleGemini31ProPreview_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
+        { AIModels_t::Google_Gemini_API_31ProPreviewCustomTools,        { *Constants::Q_QGS_GoogleGemini3ProPreviewCustomTools_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
 
-    { AIModels_t::Google_Gemini_API_ProLatest,                      { *Constants::Q_QGS_GoogleGeminiProLatest_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
+        { AIModels_t::Google_Gemini_API_ProLatest,                      { *Constants::Q_QGS_GoogleGeminiProLatest_Str, *Constants::Q_QGS_GoogleGeminiAI_Url, *Constants::Q_QGS_GoogleGemini_API_Key_Str }},
 
-    { AIModels_t::Google_HuggingFace_API,                           { *Constants::Q_QGS_GPT_4o_MiniModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_GoogleHuggingFace_API_Key_Str }},
-    { AIModels_t::GPT_4o_Mini_API,                                  { *Constants::Q_QGS_GPT_4o_MiniModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_GPT_4o_MiniKey_Str }},
-    { AIModels_t::OpenRouter_API_FreeModel,                         { *Constants::Q_QGS_OpenRouterFreeModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
-    { AIModels_t::OpenRouter_API_Deepseekv2,                        { *Constants::Q_QGS_OpenRouter_Deepseekv2Model_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
-    { AIModels_t::OpenRouter_API_Deepseekv3Base,                    { *Constants::Q_QGS_OpenRouter_Deepseekv3BaseModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
-    { AIModels_t::OpenRouter_API_DeepSeekDeepSeekV3,                { *Constants::Q_QGS_OpenRouter_DeepSeekDeepSeekV3Model_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
-    { AIModels_t::OpenRouter_API_GoogleGemini2_0FlashExperimental,  { *Constants::Q_QGS_OpenRouter_GoogleGemini2_0FlashExperimentalModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
-    { AIModels_t::OpenRouter_API_GoogleGemini2_5ProExperimental,    { *Constants::Q_QGS_OpenRouter_GoogleGemini2_5ProExperimentalModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
-    { AIModels_t::OpenRouter_API_GoogleGemma3_12B,                  { *Constants::Q_QGS_OpenRouter_GoogleGemma3_12BModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
-    { AIModels_t::OpenRouter_API_GoogleGemma3_27B,                  { *Constants::Q_QGS_OpenRouter_GoogleGemma3_27BModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
-    { AIModels_t::OpenRouter_API_GPT_4o_Mini,                       { *Constants::Q_QGS_OpenRouter_GPT_4o_MiniModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
-    { AIModels_t::OpenRouter_API_MetaLlama4Maverick,                { *Constants::Q_QGS_OpenRouter_MetaLlama4Maverick2Model_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
-    { AIModels_t::OpenRouter_API_MetaLlama4Scout,                   { *Constants::Q_QGS_OpenRouter_MetaLlama4ScoutModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
-    { AIModels_t::OpenRouter_API_MicrosoftMAIDSR1,                  { *Constants::Q_QGS_OpenRouter_MicrosoftMAIDSR1Model_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
-    { AIModels_t::OpenRouter_API_MistralMistralNemo,                { *Constants::Q_QGS_OpenRouter_MistralMistralNemoModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
-    { AIModels_t::OpenRouter_API_Qwen3235BA22B,                     { *Constants::Q_QGS_OpenRouter_Qwen3235BA22BModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }}
+        { AIModels_t::Google_HuggingFace_API,                           { *Constants::Q_QGS_GPT_4o_MiniModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_GoogleHuggingFace_API_Key_Str }},
+        { AIModels_t::GPT_4o_Mini_API,                                  { *Constants::Q_QGS_GPT_4o_MiniModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_GPT_4o_MiniKey_Str }},
+        { AIModels_t::OpenRouter_API_FreeModel,                         { *Constants::Q_QGS_OpenRouterFreeModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
+        { AIModels_t::OpenRouter_API_Deepseekv2,                        { *Constants::Q_QGS_OpenRouter_Deepseekv2Model_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
+        { AIModels_t::OpenRouter_API_Deepseekv3Base,                    { *Constants::Q_QGS_OpenRouter_Deepseekv3BaseModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
+        { AIModels_t::OpenRouter_API_DeepSeekDeepSeekV3,                { *Constants::Q_QGS_OpenRouter_DeepSeekDeepSeekV3Model_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
+        { AIModels_t::OpenRouter_API_GoogleGemini2_0FlashExperimental,  { *Constants::Q_QGS_OpenRouter_GoogleGemini2_0FlashExperimentalModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
+        { AIModels_t::OpenRouter_API_GoogleGemini2_5ProExperimental,    { *Constants::Q_QGS_OpenRouter_GoogleGemini2_5ProExperimentalModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
+        { AIModels_t::OpenRouter_API_GoogleGemma3_12B,                  { *Constants::Q_QGS_OpenRouter_GoogleGemma3_12BModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
+        { AIModels_t::OpenRouter_API_GoogleGemma3_27B,                  { *Constants::Q_QGS_OpenRouter_GoogleGemma3_27BModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
+        { AIModels_t::OpenRouter_API_GPT_4o_Mini,                       { *Constants::Q_QGS_OpenRouter_GPT_4o_MiniModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
+        { AIModels_t::OpenRouter_API_MetaLlama4Maverick,                { *Constants::Q_QGS_OpenRouter_MetaLlama4Maverick2Model_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
+        { AIModels_t::OpenRouter_API_MetaLlama4Scout,                   { *Constants::Q_QGS_OpenRouter_MetaLlama4ScoutModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
+        { AIModels_t::OpenRouter_API_MicrosoftMAIDSR1,                  { *Constants::Q_QGS_OpenRouter_MicrosoftMAIDSR1Model_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
+        { AIModels_t::OpenRouter_API_MistralMistralNemo,                { *Constants::Q_QGS_OpenRouter_MistralMistralNemoModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }},
+        { AIModels_t::OpenRouter_API_Qwen3235BA22B,                     { *Constants::Q_QGS_OpenRouter_Qwen3235BA22BModel_Str, *Constants::Q_QGS_OpenRouterAI_Url, *Constants::Q_QGS_OpenRouterKey_Str }}
+    };
+
+    return s_map;
+}
+
+// ----------------------------------------------------------------------
+// Zero-Cost C++17 Proxy for AIModelMap
+// Supports: AIModelMap[key], AIModelMap.value(key), constBegin(), constEnd()
+// ----------------------------------------------------------------------
+struct AIModelMapProxy {
+    inline const AIModelConfig& operator[](AIModels_t key) const
+    {
+        const auto &map = getAIModelMap();
+        const auto it = map.constFind(key);
+        if (it != map.constEnd()) {
+            return it.value();
+        }
+        static const AIModelConfig s_empty{};
+        return s_empty;
+    }
+
+    inline AIModelConfig value(AIModels_t key, const AIModelConfig &defaultValue = AIModelConfig()) const
+    {
+        return getAIModelMap().value(key, defaultValue);
+    }
+
+    inline bool contains(AIModels_t key) const
+    {
+        return getAIModelMap().contains(key);
+    }
+
+    inline auto constBegin() const { return getAIModelMap().constBegin(); }
+    inline auto constEnd()   const { return getAIModelMap().constEnd(); }
+    inline auto begin()      const { return getAIModelMap().begin(); }
+    inline auto end()        const { return getAIModelMap().end(); }
+    inline int size()        const { return getAIModelMap().size(); }
+    inline bool isEmpty()    const { return getAIModelMap().isEmpty(); }
+
+    inline operator const QHash<AIModels_t, AIModelConfig>&() const
+    {
+        return getAIModelMap();
+    }
 };
+
+inline constexpr AIModelMapProxy AIModelMap{};
 
 /**
  * @brief FileAPIMap
  */
-static const QHash<AIModels_t, Url> FileAPIMap = {
-    { AIModels_t::Google_Gemini_API_20FlashLite,                    *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
-    { AIModels_t::Google_Gemini_API_20FlashLite001,                 *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
-    { AIModels_t::Google_Gemini_API_20Flash,                        *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
-    { AIModels_t::Google_Gemini_API_20Flash001,                     *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
 
-    { AIModels_t::Google_Gemini_API_25Flash,                        *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
-    { AIModels_t::Google_Gemini_API_25FlashLite,                    *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+inline const QHash<AIModels_t, Url>& getFileAPIMap()
+{
+    static const QHash<AIModels_t, Url> s_map = {
+        { AIModels_t::Google_Gemini_API_20FlashLite,                    *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+        { AIModels_t::Google_Gemini_API_20FlashLite001,                 *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+        { AIModels_t::Google_Gemini_API_20Flash,                        *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+        { AIModels_t::Google_Gemini_API_20Flash001,                     *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
 
-    { AIModels_t::Google_Gemini_API_31FlashLite,                    *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
-    { AIModels_t::Google_Gemini_API_31FlashLitePreview,             *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+        { AIModels_t::Google_Gemini_API_25Flash,                        *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+        { AIModels_t::Google_Gemini_API_25FlashLite,                    *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
 
-    { AIModels_t::Google_Gemini_API_35Flash,                        *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+        { AIModels_t::Google_Gemini_API_31FlashLite,                    *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+        { AIModels_t::Google_Gemini_API_31FlashLitePreview,             *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
 
-    { AIModels_t::Google_Gemini_API_FlashLiteLatest,                *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
-    { AIModels_t::Google_Gemini_API_FlashLatest,                    *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+        { AIModels_t::Google_Gemini_API_35Flash,                        *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
 
-    { AIModels_t::Google_Gemini_API_25Pro,                          *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+        { AIModels_t::Google_Gemini_API_FlashLiteLatest,                *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+        { AIModels_t::Google_Gemini_API_FlashLatest,                    *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
 
-    { AIModels_t::Google_Gemini_API_3FlashPreview,                  *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
-    { AIModels_t::Google_Gemini_API_3ProPreview,                    *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+        { AIModels_t::Google_Gemini_API_25Pro,                          *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
 
-    { AIModels_t::Google_Gemini_API_31ProPreview,                   *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
-    { AIModels_t::Google_Gemini_API_31ProPreviewCustomTools,        *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+        { AIModels_t::Google_Gemini_API_3FlashPreview,                  *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+        { AIModels_t::Google_Gemini_API_3ProPreview,                    *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
 
-    { AIModels_t::Google_Gemini_API_ProLatest,                      *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+        { AIModels_t::Google_Gemini_API_31ProPreview,                   *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+        { AIModels_t::Google_Gemini_API_31ProPreviewCustomTools,        *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
 
-    { AIModels_t::Google_HuggingFace_API,                           *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
-    { AIModels_t::GPT_4o_Mini_API,                                  Url()},
-    { AIModels_t::OpenRouter_API_FreeModel,                         Url()},
-    { AIModels_t::OpenRouter_API_Deepseekv2,                        Url()},
-    { AIModels_t::OpenRouter_API_Deepseekv3Base,                    Url()},
-    { AIModels_t::OpenRouter_API_DeepSeekDeepSeekV3,                Url()},
-    { AIModels_t::OpenRouter_API_GoogleGemini2_0FlashExperimental,  Url()},
-    { AIModels_t::OpenRouter_API_GoogleGemini2_5ProExperimental,    Url()},
-    { AIModels_t::OpenRouter_API_GoogleGemma3_12B,                  Url()},
-    { AIModels_t::OpenRouter_API_GoogleGemma3_27B,                  Url()},
-    { AIModels_t::OpenRouter_API_GPT_4o_Mini,                       Url()},
-    { AIModels_t::OpenRouter_API_MetaLlama4Maverick,                Url()},
-    { AIModels_t::OpenRouter_API_MetaLlama4Scout,                   Url()},
-    { AIModels_t::OpenRouter_API_MicrosoftMAIDSR1,                  Url()},
-    { AIModels_t::OpenRouter_API_MistralMistralNemo,                Url()},
-    { AIModels_t::OpenRouter_API_Qwen3235BA22B,                     Url()}
-};
+        { AIModels_t::Google_Gemini_API_ProLatest,                      *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+
+        { AIModels_t::Google_HuggingFace_API,                           *Constants::Q_QGS_GoogleGeminiFileAPI_Url},
+        { AIModels_t::GPT_4o_Mini_API,                                  Url()},
+        { AIModels_t::OpenRouter_API_FreeModel,                         Url()},
+        { AIModels_t::OpenRouter_API_Deepseekv2,                        Url()},
+        { AIModels_t::OpenRouter_API_Deepseekv3Base,                    Url()},
+        { AIModels_t::OpenRouter_API_DeepSeekDeepSeekV3,                Url()},
+        { AIModels_t::OpenRouter_API_GoogleGemini2_0FlashExperimental,  Url()},
+        { AIModels_t::OpenRouter_API_GoogleGemini2_5ProExperimental,    Url()},
+        { AIModels_t::OpenRouter_API_GoogleGemma3_12B,                  Url()},
+        { AIModels_t::OpenRouter_API_GoogleGemma3_27B,                  Url()},
+        { AIModels_t::OpenRouter_API_GPT_4o_Mini,                       Url()},
+        { AIModels_t::OpenRouter_API_MetaLlama4Maverick,                Url()},
+        { AIModels_t::OpenRouter_API_MetaLlama4Scout,                   Url()},
+        { AIModels_t::OpenRouter_API_MicrosoftMAIDSR1,                  Url()},
+        { AIModels_t::OpenRouter_API_MistralMistralNemo,                Url()},
+        { AIModels_t::OpenRouter_API_Qwen3235BA22B,                     Url()}
+    };
+
+    return s_map;
+}
+
+#define FileAPIMap (getFileAPIMap())
+
 #endif
 
 /**

@@ -1371,7 +1371,7 @@ qint32 ExtractorUtils::initCmdOptions(CmdArgumentsVec &cmdArgsVec, CmdLineOption
             case CmdFlags_t::AIModelType:
             {
                 if (!val.isEmpty())
-                    cmdOptions->aiModelType = ExtractorUtils::getModelTypeFromString(val, AIModelMap);
+                    cmdOptions->aiModelType = ExtractorUtils::getModelTypeFromString(val, getAIModelMap());
 
                 break;
             }
@@ -1632,6 +1632,7 @@ qint32 ExtractorUtils::initCmdOptions(CmdArgumentsVec &cmdArgsVec, CmdLineOption
         case PipelineMode_t::EvtsExtractionOnly:
         {
             if (cmdOptions->syncedManifestsJsonFile.isEmpty() ||
+                (cmdOptions->aiModelType == AIModels_t::None) ||
                 cmdOptions->slowdownFactors.isEmpty() ||
                 (cmdOptions->clipDuration <= 0.00) ||
                 (!cmdOptions->searchedTerms.isEmpty() &&
@@ -1672,7 +1673,12 @@ qint32 ExtractorUtils::initCmdOptions(CmdArgumentsVec &cmdArgsVec, CmdLineOption
                 )
             {
                 missingArgs = true;
-                missingMsg += "entire pipeline:\n -m <mode> -i <video_file> -af <audio_format> -s2tm <audio_speech_2_text_model> -convType <converter_type> -vsm <video_seg_mode> -cd <clip_duration> -aim <ai_model_type> -sf <slowdown_factors> -ta <task_analisis> -sp <system_profile> -st <searched_terms> -sType <search_type> -ct <confidence_threshold> -td <target_dir>";
+                missingMsg += "entire pipeline:\n -m <mode> -i <video_file> -af <audio_format> "
+                              "-s2tm <audio_speech_2_text_model> -convType <converter_type> "
+                              "-vsm <video_seg_mode> -cd <clip_duration> -aim <ai_model_type> "
+                              "-sf <slowdown_factors> -ta <task_analisis> -sp <system_profile> "
+                              "-st <searched_terms> -sType <search_type> -ct <confidence_threshold> "
+                              "-td <target_dir>";
             }
         }
 
@@ -2891,9 +2897,9 @@ QString ExtractorUtils::getAPIKey(const AIModels_t apiKey)
     return key;
 }
 
-AIModels_t ExtractorUtils::getModelTypeFromString(const QString &val, QHash<AIModels_t, AIModelConfig> map)
+AIModels_t ExtractorUtils::getModelTypeFromString(const QString &val, const QHash<AIModels_t, AIModelConfig> &modelMap)
 {
-    for (auto it = map.constBegin(); it != map.constEnd(); ++it)
+    for (auto it = modelMap.constBegin(); it != modelMap.constEnd(); ++it)
     {
         if (it.value().name == val)
         {

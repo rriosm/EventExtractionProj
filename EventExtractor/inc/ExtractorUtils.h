@@ -221,7 +221,7 @@ class ExtractorUtils
          * @param AIModelMap
          * @return
          */
-        [[nodiscard]] static AIModels_t getModelTypeFromString(const QString &val, QHash<AIModels_t, AIModelConfig> AIModelMap);
+        [[nodiscard]] static AIModels_t getModelTypeFromString(const QString &val, const QHash<AIModels_t, AIModelConfig> &modelMap = getAIModelMap());
 
         /**
          * @brief headerTemplate
