@@ -205,6 +205,7 @@ macx {
 # ----------------------------------------------------------------------
 
 HEADERS += \
+    inc/EventSynchronizer.h \
     inc/Actor.h \
     inc/Audio.h \
     inc/AudioAnnotationSegmentationController.h \
@@ -259,6 +260,7 @@ HEADERS += \
     # inc/AudioEtiandRe.h
 
 SOURCES += \
+    src/EventSynchronizer.cpp \
     src/ExtractorUtils.cpp \
     src/main.cpp \
     src/Actor.cpp \

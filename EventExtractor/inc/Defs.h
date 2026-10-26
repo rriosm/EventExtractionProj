@@ -80,7 +80,7 @@ namespace Constants {
 
     Q_GLOBAL_STATIC_WITH_ARGS(const Url,        Q_QGS_DeepgramS2TNova2GeneralPTBR_Url,  ("https://api.deepgram.com/v1/listen?model=nova-2-general&smart_format=true&language=pt-BR&diarize=true&punctuate=true&utterances=true&utt_split="+QString::number(*Q_QGS_DeepgramUtterance)));
 
-    Q_GLOBAL_STATIC_WITH_ARGS(const Url,        Q_QGS_DeepgramS2TNova2GeneralEN_Url,    ("https://api.deepgram.com/v1/listen?model=nova-2-general&smart_format=true&language=en&diarize=true&punctuate=true&utterances=true&utt_split="+QString::number(*Q_QGS_DeepgramUtterance)));
+    Q_GLOBAL_STATIC_WITH_ARGS(const Url,        Q_QGS_DeepgramS2TNova2GeneralEN_Url,    ("https://api.deepgram.com/v1/listen?model=nova-2-general&&version=2024-01-06.5664&smart_format=true&language=en&diarize=true&punctuate=true&utterances=true&utt_split="+QString::number(*Q_QGS_DeepgramUtterance)));
 
     Q_GLOBAL_STATIC_WITH_ARGS(const Url,        Q_QGS_DeepgramS2TNova3_Url,             ("https://api.deepgram.com/v1/listen?model=nova-3&smart_format=true&language=multi&diarize=true&punctuate=true&utterances=true&utt_split="+QString::number(*Q_QGS_DeepgramUtterance)));
 
