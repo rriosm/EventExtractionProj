@@ -1,4 +1,4 @@
-# CENTERIS
+# EventExtractionProj
 
 A modular C++ / Qt framework and application suite designed for video event extraction, speech-to-text processing, and multimodal media analysis. The repository is organized as a multi-project Qt workspace consisting of core dynamic shared libraries and a CLI processing tool.
 
@@ -9,7 +9,7 @@ A modular C++ / Qt framework and application suite designed for video event extr
 The project is structured into shared libraries and executable applications:
 
 ```text
-CENTERIS/
+EventExtractionProj/
 ├── Logger/                 # Core cross-platform dynamic logging library
 │   ├── inc/                # Public headers (Logger.h, Logger_global.h)
 │   ├── src/                # Implementation files
@@ -22,14 +22,14 @@ CENTERIS/
 │   ├── inc/                # Application headers
 │   ├── src/                # Pipeline logic and main.cpp
 │   └── EventExtractor.pro  # Application build configuration
-└── CENTERIS.pro            # Top-level subdirs build definition
+└── EventExtractorMain.pro  # Top-level subdirs build definition
 ```
 ---
 
 ### AI Prompts
 
 ```text
-CENTERIS
+EventExtractionProj
 ├── Resources/
 │   ├── Prompts/
 │   │   ├── BaselinePrompt.txt
@@ -169,7 +169,7 @@ From the project root:
 
 ```bash
 # 1. Run qmake on the root multi-project file
-qmake CENTERIS.pro
+qmake EventExtractionProj.pro
 
 # 2. Compile all targets in sequence
 make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
